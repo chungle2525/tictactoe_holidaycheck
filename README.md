@@ -18,10 +18,11 @@ will appear:
 > Please enter a valid board position in the format RC, where R is the row
 (1-3) and C is the column (A-C)
 
+
 The positions for each board position are shown below:
 --------------------------------
 |		  |          |         |
-|   3A    |    3B    |    3C   |
+|   1A    |    1B    |    1C   |
 |		  |          |         |
 --------------------------------
 |		  |          |         |
@@ -29,25 +30,26 @@ The positions for each board position are shown below:
 |		  |          |         |
 --------------------------------
 |		  |          |         |
-|   1A    |    1B    |    1C   |
+|   3A    |    3B    |    3C   |
 |		  |          |         |
 --------------------------------
 
 Available positions will appear empty. Positions taken by the user will contain
 an 'X' and positions taken by the computer will contain an 'O'. Here is a
 possible board state in during the game:
+-------------------------------
+|		  |         |         |
+|    O    |    X    |         |
+|		  |         |         |
 --------------------------------
-|		  |          |         |
-|    O    |     X    |         |
-|		  |          |         |
+|		  |         |         |
+|         |    X    |         |
+|		  |         |         |
 --------------------------------
-|		  |          |         |
-|         |     X    |         |
-|		  |          |         |
---------------------------------
-|		  |          |         |
-|         |     O    |         |
-|		  |          |         |
---------------------------------
+|		  |         |         |
+|         |    O    |         |
+|		  |         |         |
+-------------------------------
 
-
+Once a player wins, the user has the option to exit the program or play another
+tic tac toe game.
