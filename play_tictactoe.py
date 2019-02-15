@@ -9,10 +9,10 @@ def play_game():
 		  'The game can be exited any time by holding Control+C\n'\
 		  'or typing "exit"\n\n'\
 		  'Below is the empty board. Have fun! \n\n')
-	taken = {}
-	taken['A'] = ['-', '-', '-']
-	taken['B'] = ['-', '-', '-']
-	taken['C'] = ['-', '-', '-']
+	taken = []
+	taken.append(['-', '-', '-'])
+	taken.append(['-', '-', '-'])
+	taken.append(['-', '-', '-'])
 	print_board(taken)
 	num_moves = 0
 	while True:
@@ -22,28 +22,30 @@ def play_game():
 			return
 		# check for valid user input
 		if len(move) == 2:
-			int_row = int(move[0])
+			int_row = int(move[0]) - 1
 			# check for valid row
-			if int_row != 1 and int_row != 2 and int_row != 3:
+			if int_row != 0 and int_row != 1 and int_row != 2:
 				print('Invalid row!')
 				continue
 			# check for column
-			upper_col = move[1].upper()
-			if upper_col != 'A' and upper_col != 'B' and upper_col != 'C':
+			lower_col = move[1].lower()
+			if lower_col != 'a' and lower_col != 'b' and lower_col != 'c':
 				print('Invalid column!')
 				continue
+			int_col = ord(lower_col) - 97
 			# check that position is available
-			if taken[upper_col][int_row - 1] != '-':
+			if taken[int_col][int_row] != '-':
 				print('Position unavailable!')
 				continue
 			else:
 				num_moves += 1
 				# valid input
-				taken[upper_col][int_row - 1] = 'X'
-				make_move(num_moves, taken)
+				taken[int_col][int_row] = 'X'
+				make_move(taken)
 				print_board(taken)
 				# check for winner
-				winner = check_for_winner(num_moves, taken)
+				winner = check_for_winner(num_moves, int_col, int_row, 'X',
+					                      taken)
 				if winner != '-':
 					if winner == 'X':
 						print('Winner: X (you)\n'\
@@ -57,11 +59,12 @@ def play_game():
 					play_again = input('Play again? (Y/N): ')
 					if play_again == 'Y' or play_again == 'y':
 						# reset taken positions
-						taken['A'] = ['-', '-', '-']
-						taken['B'] = ['-', '-', '-']
-						taken['C'] = ['-', '-', '-']
+						taken[0] = ['-', '-', '-']
+						taken[1] = ['-', '-', '-']
+						taken[2] = ['-', '-', '-']
 						# reset the move count and restart game
 						num_moves = 0
+						print_board(taken)
 						continue
 					else:
 						print('Goodbye!')
@@ -70,11 +73,43 @@ def play_game():
 			print('Invalid input!')
 			continue
 
-def make_move(num_moves, taken):
+def make_move(taken):
 	pass
 
 
-def check_for_winner(num_moves, taken):
+def check_for_winner(num_moves, current_col, current_row, player, taken):
+	# check for vertical win
+	row_idx = 0
+	while row_idx < 3:
+		if taken[current_col][row_idx] != player:
+			# no win
+			break
+		row_idx += 1
+	if row_idx == 3:
+		return player
+
+	# check for horizontal win
+	col_idx = 0
+	while col_idx < 3:
+		if taken[col_idx][current_row] != player:
+			break
+		col_idx += 1
+	if col_idx == 3:
+		return player
+
+	# check for diagonal win if move is one of the 4 corners or the center
+	if current_col == current_row or (current_col + current_row == 2):
+		# can only be diagonal win if center == player
+		if (taken[1][1] == player):
+			if (taken[0][0] == player) and (taken[2][2] == player):
+				return player
+			if (taken[2][0] == player) and (taken[0][2] == player):
+				return player
+
+	# if no winner is found and board is full, it is a Cat's game (tie)
+	if num_moves == 9:
+		return 'C'
+
 	return '-'
 
 
@@ -86,12 +121,12 @@ def print_board(taken):
 		col_a = ' '
 		col_b = ' '
 		col_c = ' '
-		if taken['A'][row] != '-':
-			col_a = taken['A'][row]
-		if taken['B'][row] != '-':
-			col_b = taken['B'][row]
-		if taken['C'][row] != '-':
-			col_c = taken['C'][row]
+		if taken[0][row] != '-':
+			col_a = taken[0][row]
+		if taken[1][row] != '-':
+			col_b = taken[1][row]
+		if taken[2][row] != '-':
+			col_c = taken[2][row]
 
 		print('%c     %s    |    %s    |    %s    ' % (str(row + 1), col_a,
 			                                           col_b, col_c))
