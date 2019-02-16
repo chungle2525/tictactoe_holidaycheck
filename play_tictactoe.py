@@ -18,87 +18,86 @@ def play_game():
 							(2, 4, 6)]
 
 	start = True
+	player = 'O'
 	while True:
 		if not start:
-			move = input('Your turn!\n'\
-				         'Enter a position: ')
-			move = move.lower()
-			if move == 'exit':
-				print('Goodbye!')
-				return
-			if check_input(move, board):
-				num_moves += 1
-				int_row = int(move[0]) - 1
-				int_col = ord(move[1]) - 97
-				board[(3 * int_row) + int_col] = 'X'
-				print_board(board)
-
-				# check for winner
-				winner = check_for_winner(num_moves, int_col, int_row, 'X',
-					                      board, winning_combinations)
-				if winner != '-':
-					# a user can only win after they take a turn
-					if winner == 'X':
-						print('Winner: X (you)\n'\
-							  'Congratulations, you won!')
-						user_score += 1
-						print_scores(user_score, computer_score)
-					# since they always make the first move, a tie game can
-					# only happen after the user takes their turn
-					if winner == 'C':
-						print("Winner: It's a tie!\n"\
-							  "Better luck next time!")
-						print_scores(user_score, computer_score)
-
-					if play_again(board):
-						num_moves = 0
-						start = True
-						continue
-					else:
+			winner = '-'
+			# user's turn
+			if player == 'X':
+				try:
+					move = input('Your turn!\n'\
+						         'Enter a position: ')
+					move = move.lower()
+					if move == 'exit':
 						print('Goodbye!')
 						return
-
-				# make computer move if user's move does not produce win
+					if check_input(move, board):
+						int_row = int(move[0]) - 1
+						int_col = ord(move[1]) - 97
+						position = (int_row * 3) + int_col
+						make_move(player, position, board)
+						num_moves += 1
+						winner = check_for_winner(num_moves, player, board,
+					                      winning_combinations)
+						player = 'O'
+				except KeyboardInterrupt:
+					print('\nGoodbye!')
+					return
+			else:
+				# if random index is taken, search iteratively for open spot
+				random_idx = random.randint(0, 8)
+				if board[random_idx] != '-':
+					for adder in range(1, 9):
+						new_idx = (random_idx + adder) % 9
+						if board[new_idx] == '-':
+							random_idx = new_idx
+							break
+				make_move(player, random_idx, board)
 				num_moves += 1
-				print("Computer's turn!")
-				computer_move(board)
-				winner = check_for_winner(num_moves, int_col, int_row, 'O',
-					          board, winning_combinations)
+				# check for winner
+				winner = check_for_winner(num_moves, player, board,
+				                      winning_combinations)
+				player = 'X'
 
-				if winner != '-':
-					# the computer can only win if it is its own turn
-					if winner == 'O':
-						print('Winner: O (computer)\n'\
-							  'Sorry, you lost. Better luck next time!')
-						computer_score += 1
-						print_scores(user_score, computer_score)
-					if winner == 'C':
-						print("Winner: It's a tie!\n"\
-							  "Better luck next time!")
-						print_scores(user_score, computer_score)
-					
+			if winner != '-':
+				# user wins
+				if winner == 'X':
+					print('Winner: X (you)\n'\
+						  'Congratulations, you won!')
+					user_score += 1
+				# computer wins
+				if winner == 'O':
+					print('Winner: O (computer)\n'\
+						  'Sorry, you lost. Better luck next time!')
+					computer_score += 1
+				# tie game
+				if winner == 'C':
+					print("Winner: It's a tie!\n"\
+						  "Better luck next time!")
+				
+				print_scores(user_score, computer_score)
+
+				try:
 					if play_again(board):
 						num_moves = 0
 						start = True
 						continue
+				except KeyboardInterrupt:
+					print('\nGoodbye!')
+					return
+				else:
 					print('Goodbye!')
 					return
 
-			else:
-				continue
 		else:
-			starter = determine_start()
+			starter = random.randint(0, 1)
 			start = False
 			if starter == 0:
-				num_moves += 1
 				print("Computer starts!")
-				computer_move(board)
+				player = 'O'
 			else:
-				continue
-
-
-def determine_start():
-	return random.randint(0, 1)
+				print("You start!")
+				player = 'X'
 
 
 def check_input(move, board):
@@ -126,20 +125,18 @@ def check_input(move, board):
 	return False
 
 
-def computer_move(board):
+def make_move(player, move, board):
 	# if random index is taken, search iteratively for open spot
-	random_idx = random.randint(0, 8)
-	if board[random_idx] != '-':
-		for adder in range(1, 9):
-			new_idx = (random_idx + adder) % 9
-			if board[new_idx] == '-':
-				random_idx = new_idx
-				break
-	board[random_idx] = 'O'
+	if player == 'O':
+		print("Computer's turn!")
+		board[move] = 'O'
+	else:
+		print('Your turn!')
+		board[move] = 'X'
 	print_board(board)
 
 
-def check_for_winner(moves, col, row, player, board, winning_combos):
+def check_for_winner(moves, player, board, winning_combos):
 	# check for vertical win
 	for combo in winning_combos:
 		if (board[combo[0]] == player and board[combo[1]] == player and
