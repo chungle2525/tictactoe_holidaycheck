@@ -4,6 +4,8 @@ def play_game():
 	print_welcome()
 	# initialize the board array of size 9. '-' indicates an empty spot
 	board = ['-', '-', '-', '-', '-', '-', '-', '-', '-']
+	computer_score = 0
+	user_score = 0
 	print_board(board)
 	num_moves = 0
 	winning_combinations = [(0, 1, 2),
@@ -39,11 +41,14 @@ def play_game():
 					if winner == 'X':
 						print('Winner: X (you)\n'\
 							  'Congratulations, you won!')
+						user_score += 1
+						print_scores(user_score, computer_score)
 					# since they always make the first move, a tie game can
 					# only happen after the user takes their turn
 					if winner == 'C':
 						print("Winner: It's a tie!\n"\
 							  "Better luck next time!")
+						print_scores(user_score, computer_score)
 
 					if play_again(board):
 						num_moves = 0
@@ -59,14 +64,26 @@ def play_game():
 				computer_move(board)
 				winner = check_for_winner(num_moves, int_col, int_row, 'O',
 					          board, winning_combinations)
-				# the computer can only win if it is its own turn
-				if winner == 'O':
-					print('Winner: O (computer)\n'\
-						  'Sorry, you lost. Better luck next time!')
+
+				if winner != '-':
+					# the computer can only win if it is its own turn
+					if winner == 'O':
+						print('Winner: O (computer)\n'\
+							  'Sorry, you lost. Better luck next time!')
+						computer_score += 1
+						print_scores(user_score, computer_score)
+					if winner == 'C':
+						print("Winner: It's a tie!\n"\
+							  "Better luck next time!")
+						print_scores(user_score, computer_score)
+					
 					if play_again(board):
 						num_moves = 0
 						start = True
 						continue
+					print('Goodbye!')
+					return
+
 			else:
 				continue
 		else:
@@ -134,6 +151,12 @@ def check_for_winner(moves, col, row, player, board, winning_combos):
 		return 'C'
 
 	return '-'
+
+
+def print_scores(user_score, comp_score):
+	print('\nSCORES:\n'\
+		  'You: ' + str(user_score) + '\n'\
+		  'Computer: ' + str(comp_score) + '\n')
 
 
 def play_again(board):
