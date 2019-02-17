@@ -1,6 +1,7 @@
 import random
 
 def play_game():
+	"""Play a game of tic-tac-toe against the user."""
 	print_welcome()
 	# initialize the board array of size 9. '-' indicates an empty spot
 	board = ['-', '-', '-', '-', '-', '-', '-', '-', '-']
@@ -25,11 +26,11 @@ def play_game():
 			# user's turn
 			if player == 'X':
 				try:
-					move = input('Your turn!\n'\
+					move = input('Your turn\n'\
 						         'Enter a position: ')
 					move = move.lower()
 					if move == 'exit':
-						print('Goodbye!')
+						print('Goodbye')
 						return
 					if check_input(move, board):
 						int_row = int(move[0]) - 1
@@ -41,7 +42,7 @@ def play_game():
 					                      winning_combinations)
 						player = 'O'
 				except KeyboardInterrupt:
-					print('\nGoodbye!')
+					print('\nGoodbye')
 					return
 			else:
 				# if random index is taken, search iteratively for open spot
@@ -68,12 +69,12 @@ def play_game():
 				# computer wins
 				if winner == 'O':
 					print('Winner: O (computer)\n'\
-						  'Sorry, you lost. Better luck next time!')
+						  'Sorry, you lost. Better luck next time.')
 					computer_score += 1
 				# tie game
 				if winner == 'C':
 					print("Winner: It's a tie!\n"\
-						  "Better luck next time!")
+						  "Better luck next time.")
 				
 				print_scores(user_score, computer_score)
 
@@ -83,13 +84,14 @@ def play_game():
 						start = True
 						continue
 				except KeyboardInterrupt:
-					print('\nGoodbye!')
+					print('\nGoodbye')
 					return
 				else:
-					print('Goodbye!')
+					print('Goodbye')
 					return
-
+		# first move
 		else:
+			# randomly choose starting player
 			starter = random.randint(0, 1)
 			start = False
 			if starter == 0:
@@ -101,43 +103,49 @@ def play_game():
 
 
 def check_input(move, board):
+	"""Return whether or not the user input has valid length, row, column and
+	   position.
+	"""
 	if len(move) == 2:
 		if not move[0].isdigit():
-			print('Invalid row!')
+			print('Oops, you entered an invalid row.')
 			return False
 		int_row = int(move[0]) - 1
 		# check for valid row
 		if int_row != 0 and int_row != 1 and int_row != 2:
-			print('Invalid row!')
+			print('Oops, you entered an invalid row.')
 			return False
 		# check for valid column
 		col = move[1]
 		if col != 'a' and col != 'b' and col != 'c':
-			print('Invalid column!')
+			print('Oops, you entered an invalid column.')
 			return False
 		int_col = ord(col) - 97
 		# check that position is available
 		if board[(3 * int_row) + int_col] != '-':
-			print('Position unavailable!')
+			print('Oops, that position is taken.')
 			return False
 		return True
-	print('Invalid input!')
+	print('Invalid input.')
 	return False
 
 
 def make_move(player, move, board):
-	# if random index is taken, search iteratively for open spot
+	"""Make the player's move on the game board. X=user, O=computer."""
 	if player == 'O':
-		print("Computer's turn!")
+		print("Computer's turn")
 		board[move] = 'O'
 	else:
-		print('Your turn!')
+		print('Your turn')
 		board[move] = 'X'
+
 	print_board(board)
 
 
 def check_for_winner(moves, player, board, winning_combos):
-	# check for vertical win
+	"""Check if player has acquired a winning combination.
+	   If so, return player. Otherwise, return '-'.
+    """
 	for combo in winning_combos:
 		if (board[combo[0]] == player and board[combo[1]] == player and
 			board[combo[2]] == player):
@@ -151,12 +159,18 @@ def check_for_winner(moves, player, board, winning_combos):
 
 
 def print_scores(user_score, comp_score):
-	print('\nSCORES:\n'\
-		  'You: ' + str(user_score) + '\n'\
-		  'Computer: ' + str(comp_score) + '\n')
+	"""Print the total score of the user and the computer.
+	   Scores reset if the user exits the program.
+	"""
+	print('\n*SCORES:\n'\
+		  '*You: ' + str(user_score) + '\n'\
+		  '*Computer: ' + str(comp_score) + '\n')
 
 
 def play_again(board):
+	"""Return whether or not the user wants to play another game.
+	   If True, reset the board to contain all empty positions.
+	"""
 	play_again = input('Play again? (Y/N): ')
 	if play_again == 'Y' or play_again == 'y':
 		# reset board positions
@@ -167,10 +181,14 @@ def play_again(board):
 
 
 def print_board(board):
-	print('      A         B         C')
+	"""Print the current state of the game board.
+	   Spots taken by the user are represented by 'X'.
+	   Spots taken by the computer are represented by 'O'.
+	"""
+	board_str = '      A         B         C\n'
 	for row in range(0, 3):
-		print('           |         |         ')
-		# print if taken
+		board_str += '           |         |         \n'
+		# print player if spot is taken
 		col_a = ' '
 		col_b = ' '
 		col_c = ' '
@@ -181,27 +199,32 @@ def print_board(board):
 		if board[(3 * row) + 2] != '-':
 			col_c = board[(3 * row) + 2]
 
-		print('%c     %s    |    %s    |    %s    ' % (str(row + 1), col_a,
-			                                           col_b, col_c))
-		print('           |         |         ')
+		board_str += ('%c     %s    |    %s    |    %s    \n'
+			          % (str(row + 1), col_a, col_b, col_c))
+		board_str += '           |         |         \n'
 		if row < 2:
-			print('  -------------------------------')
-	print('\n')
+			board_str += '  -------------------------------\n'
+	print(board_str + '\n')
 
 
 def print_welcome():
+	"""Print welcome, directions and rules. Only prints at the start
+	   of the program.
+	"""
 	print('\nWelcome to Tic Tac Toe.\n'\
+		  'To win this game, acquire 3 spots in a row\n'\
+		  '(vertically, horizontally, or diagonally).\n'\
 		  'When prompted, make a move by typing in the Row (1-3) and \n'\
-		  'Column (A-C) of the desired position in the format RC.\n'\
+		  'Column (A-C) of your desired position in the format RC.\n'\
 		  'Here are some possible moves:\n'\
 		  '    > 3A\n'\
 		  '    > 2C\n'\
 		  '    > 1B\n\n'\
-		  "*  Your moves are represented by 'X'\n"\
-		  "*  The computer's moves are represented by 'O'\n"\
+		  "*  Your moves are represented by 'X'.\n"\
+		  "*  The computer's moves are represented by 'O'.\n"\
 		  '*  The starting player is randomly chosen.\n'\
 		  '*  You may exit the game any time by holding Control+C\n'\
-		  '   or typing "exit"\n\n'\
+		  '   or typing "exit".\n\n'\
 		  'Below is the empty board. Have fun!\n')
 
 
