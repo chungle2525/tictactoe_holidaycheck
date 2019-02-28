@@ -19,6 +19,9 @@ class WinCombo:
 					return True
 		return False
 
+	def __str__(self):
+		return ("INDICES: " + str(self.indices) + (" USER: %d, COMP: %d" % (self.user_count, self.comp_count)))
+
 
 class TicTacToeBoard:
 
@@ -31,8 +34,8 @@ class TicTacToeBoard:
 		self.board = [' '] * (self.size * self.size)
 
 		self.combo_queue = []
-		# winning rows
 		combo_count = 0
+		# winning rows
 		for row in range(0, self.size):
 			columns = []
 			for col in range(0, self.size):
@@ -77,6 +80,7 @@ class TicTacToeBoard:
 	def choose_starter(self):
 		"""randomly choose starting player"""
 		starter = random.randint(0, 1)
+		starter = 1
 		if starter == 0:
 			print("Computer starts!")
 			board.player = 'O'
@@ -107,6 +111,33 @@ class TicTacToeBoard:
 		position = (int_row * self.size) + int_col
 		self.make_move(position)
 
+	def could_win(self, move, player):
+		possible_wins = 0
+		for combo in self.combo_queue:
+			if player == 'X':
+				if (move in combo.indices and combo.user_count + 1 == self.size - 1):
+					possible_wins += 1
+			else:
+				if (move in combo.indices) and (combo.comp_count + 1 == self.size - 1):
+					possible_wins += 1
+		if possible_wins > 1:
+			return True
+
+	def first_comp_move(self):
+		# choose center or corner
+		mul = (self.size - 1) / 2
+		center = (self.size * mul) + mul
+		center = int(center)
+		if self.is_open(center):
+			self.make_move(center)
+		else:
+			corners = [0, (self.size - 1), (self.size * (self.size - 1)),
+			           ((self.size + 1) * (self.size - 1))]
+			for corner in corners:
+				if self.is_open(corner):
+					self.make_move(corner)
+					break
+
 	def make_winning_move(self):
 		move = 0
 		found = False
@@ -131,35 +162,46 @@ class TicTacToeBoard:
 				return True
 		return False
 
-	def first_comp_move(self):
-		mul = (self.size - 1) / 2
-		center = (self.size * mul) + mul
-		center = int(center)
-		if self.is_open(center):
-			self.make_move(center)
-		else:
-			corners = [0, (self.size - 1), (self.size * (self.size - 1)),
-			           ((self.size + 1) * (self.size - 1))]
-			for corner in corners:
-				if self.is_open(corner):
-					self.make_move(corner)
-					break
+	def handle_corners(self):
+		corners = [0, (self.size - 1), (self.size * (self.size - 1)),
+			       ((self.size + 1) * (self.size - 1))]
+		if ((self.board[corners[0]] == 'X' and self.board[corners[3]] == 'X') or
+			(self.board[corners[1]] == 'X' and self.board[corners[2]] == 'X')):
+			found = False
+			for combo in self.combo_queue:
+				for idx in combo.indices:
+					if self.is_open(idx):
+						self.make_move(idx)
+						return True
+		return False
 
 	def make_comp_move(self):
 		self.combo_queue.sort(reverse=True)
+		print("SORTED")
+		for combo in self.combo_queue:
+			print(combo)
 		if self.moves > 1:			
 			winning_move = self.make_winning_move()
 			if not winning_move:
-				found = False
-				for combo in self.combo_queue:
-					for idx in combo.indices:
-						if self.board[idx] == ' ':
-							move = idx
-							found = True
+				user_has_corners = self.handle_corners()
+				if not user_has_corners:
+					print('nonwin')
+					found = False
+					for combo in self.combo_queue:
+						for idx in combo.indices:
+							if self.is_open(idx) and self.could_win(idx, 'O'):
+								move = idx
+								found = True
+								break
+							if self.is_open(idx) and self.could_win(idx, 'X'):
+								move = idx
+								found = True
+								break
+						if found:
+							self.make_move(move)
 							break
-					if found:
-						self.make_move(move)
-						break
+				else:
+					pass
 		else:
 			self.first_comp_move()
 
@@ -222,9 +264,9 @@ class TicTacToeBoard:
 		play_again = input('Play again? (Y/N): ')
 		if play_again == 'Y' or play_again == 'y':
 			self.moves = 0
-			self.player = 'O'
 			self.board = [' '] * (self.size * self.size)
 			self.print_board()
+			self.choose_starter()
 			for combo in self.combo_queue:
 				combo.user_count = 0
 				combo.comp_count = 0
