@@ -19,9 +19,6 @@ class WinCombo:
 					return True
 		return False
 
-	def __str__(self):
-		return ("INDICES: " + str(self.indices) + (" USER: %d, COMP: %d" % (self.user_count, self.comp_count)))
-
 
 class TicTacToeBoard:
 
@@ -34,7 +31,6 @@ class TicTacToeBoard:
 		self.comp_score = 0
 		self.board = [' '] * (self.size * self.size)
 
-		# self.win_combos = []
 		self.combo_queue = []
 		# winning rows
 		combo_count = 0
@@ -43,7 +39,6 @@ class TicTacToeBoard:
 			for col in range(0, self.size):
 				columns.append((row * self.size) + col)
 			tpl = tuple(columns)
-			# self.win_combos.append(tpl)
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
@@ -54,7 +49,6 @@ class TicTacToeBoard:
 			for row in range(0, self.size):
 				rows.append(col + (row * self.size))
 			tpl = tuple(rows)
-			# self.win_combos.append(tpl)
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
@@ -67,7 +61,6 @@ class TicTacToeBoard:
 				diag1.append((i) * (self.size + 1))
 				i += 1
 			tpl = tuple(diag1)
-			# self.win_combos.append(tpl)
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
@@ -78,7 +71,6 @@ class TicTacToeBoard:
 				diag2.append((j + 1) * (self.size - 1))
 				j += 1
 			tpl = tuple(diag2)
-			# self.win_combos.append(tpl)
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
@@ -193,7 +185,6 @@ class TicTacToeBoard:
 		"""Check if player has acquired a winning combination.
 		   If so, return player. Otherwise, return ' '.
 	    """
-		# for combo in self.win_combos:
 		for combo in self.combo_queue:
 			current = True
 			for idx in combo.indices:
@@ -274,12 +265,8 @@ class TicTacToeBoard:
 		print(board_str + '\n')
 
 
-def play_game(length):
+def play_game(board):
 	"""Play a game of tic-tac-toe against the user."""
-	board = TicTacToeBoard(length)
-	print_welcome()
-	board.print_board()
-
 	while True:
 		if not board.start:
 			winner = ' '
@@ -368,4 +355,7 @@ def print_welcome():
 
 if __name__ == '__main__':
 	# hardcoded game dimension of size 3
+	board = TicTacToeBoard(length)
+	print_welcome()
+	board.print_board()
 	play_game(3)
