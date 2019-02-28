@@ -9,6 +9,7 @@ class TicTacToeBoard:
 		self.player = 'O'
 		self.user_score = 0
 		self.comp_score = 0
+		self.comp_moves = []
 		self.board = [' '] * (self.size * self.size)
 
 		self.win_combos = []
@@ -17,14 +18,14 @@ class TicTacToeBoard:
 			columns = []
 			for col in range(0, self.size):
 				columns.append((row * self.size) + col)
-			self.win_combos.append(columns)
+			self.win_combos.append(tuple(columns))
 
 		# winning columns
 		for col in range(0, self.size):
 			rows = []
 			for row in range(0, self.size):
 				rows.append(col + (row * self.size))
-			self.win_combos.append(rows)
+			self.win_combos.append(tuple(rows))
 
 		# winning diags
 		diag1 = []
@@ -32,14 +33,14 @@ class TicTacToeBoard:
 		while i < self.size:
 			diag1.append((i) * (self.size + 1))
 			i += 1
-		self.win_combos.append(diag1)
+		self.win_combos.append(tuple(diag1))
 
 		diag2 = []
 		j = 0
 		while j < self.size:
 			diag2.append((j + 1) * (self.size - 1))
 			j += 1
-		self.win_combos.append(diag2)
+		self.win_combos.append(tuple(diag2))
 
 	def make_move(self, move):
 		"""Make the player's move on the game board. X=user, O=computer."""
@@ -49,6 +50,23 @@ class TicTacToeBoard:
 			print('Your turn')
 		self.board[move] = self.player
 		self.print_board()
+
+	def make_comp_move(self):
+		size = self.size
+		size = size * size
+		compmove = random.randint(0, (size - 1))
+		if not self.open_spot(compmove):
+			for adder in range(1, size):
+				new_idx = (compmove + adder) % size
+				if self.open_spot(new_idx):
+					compmove = new_idx
+					break
+		self.make_move(compmove)
+		self.comp_moves.append(compmove)
+
+		self.moves += 1
+		winner = self.check_for_winner()
+		self.player = 'X'
 
 	def check_input(self, move):
 		"""Return whether or not the user input has valid length, row, column and
@@ -190,19 +208,7 @@ def play_game(length):
 					return
 			else:
 				# randomly choose spot, then linear probe
-				size = board.size
-				size = size * size
-				compmove = random.randint(0, (size - 1))
-				if not board.open_spot(compmove):
-					for adder in range(1, size):
-						new_idx = (compmove + adder) % size
-						if board.board[new_idx] == ' ':
-							compmove = new_idx
-							break
-				board.make_move(compmove)
-				board.moves += 1
-				winner = board.check_for_winner()
-				board.player = 'X'
+				board.make_comp_move()
 
 			if winner != ' ':
 				# user wins
