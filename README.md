@@ -2,8 +2,8 @@
 tic-tac-toe challenge for Holidaycheck recruiting process
 
 This python program plays tic-tac-toe against the user. The program prints the
-3x3 tic-tac-toe board to the terminal after each move. The user always makes
-the first move.
+3x3 tic-tac-toe board to the terminal after each move.
+
 The program can be started with:
 > python3 play_tictactoe.py
 
@@ -51,4 +51,5 @@ possible board state in during the game:
 -------------------------------
 
 Once a player wins, the user has the option to exit the program or play another
-tic tac toe game.
+tic tac toe game. The user can exit the program at any time by typing 'exit'
+or holding Control+C.
