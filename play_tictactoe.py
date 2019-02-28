@@ -60,7 +60,7 @@ class TicTacToeBoard:
 				return False
 			int_row = int(move[0]) - 1
 			# check for valid row
-			if int_row >= self.size or int_row < 0:
+			if int_row >= self.size:
 				print('Oops, you entered an invalid row.')
 				return False
 			# check for valid column
