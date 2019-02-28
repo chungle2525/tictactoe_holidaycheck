@@ -2,7 +2,8 @@ import random
 
 class WinCombo:
 
-	def __init__(self, combo):
+	def __init__(self, id_in, combo):
+		self.id = id_in
 		self.user_count = 0
 		self.comp_count = 0
 		self.indices = combo
@@ -13,6 +14,9 @@ class WinCombo:
 		if self.comp_count == other.comp_count:
 			if self.user_count > other.user_count:
 				return True
+			if self.user_count == other.user_count:
+				if self.id < other.id:
+					return True
 		return False
 
 	def __str__(self):
@@ -33,13 +37,15 @@ class TicTacToeBoard:
 		self.win_combos = []
 		self.combo_queue = []
 		# winning rows
+		combo_count = 0
 		for row in range(0, self.size):
 			columns = []
 			for col in range(0, self.size):
 				columns.append((row * self.size) + col)
 			tpl = tuple(columns)
 			self.win_combos.append(tpl)
-			combo = WinCombo(tpl)
+			combo = WinCombo(combo_count, tpl)
+			combo_count += 1
 			self.combo_queue.append(combo)
 
 		# winning columns
@@ -49,7 +55,8 @@ class TicTacToeBoard:
 				rows.append(col + (row * self.size))
 			tpl = tuple(rows)
 			self.win_combos.append(tpl)
-			combo = WinCombo(tpl)
+			combo = WinCombo(combo_count, tpl)
+			combo_count += 1
 			self.combo_queue.append(combo)
 
 		# winning diags
@@ -60,7 +67,8 @@ class TicTacToeBoard:
 			i += 1
 		tpl = tuple(diag1)
 		self.win_combos.append(tpl)
-		combo = WinCombo(tpl)
+		combo = WinCombo(combo_count, tpl)
+		combo_count += 1
 		self.combo_queue.append(combo)
 
 		diag2 = []
@@ -70,7 +78,8 @@ class TicTacToeBoard:
 			j += 1
 		tpl = tuple(diag2)
 		self.win_combos.append(tpl)
-		combo = WinCombo(tpl)
+		combo = WinCombo(combo_count, tpl)
+		combo_count += 1
 		self.combo_queue.append(combo)
 
 	def make_move(self, move):
@@ -96,35 +105,53 @@ class TicTacToeBoard:
 		position = (int_row * self.size) + int_col
 		self.make_move(position)
 
+	def make_winning_move(self):
+		move = 0
+		found = False
+		# winning moves
+		for combo in self.combo_queue:
+			if combo.user_count == self.size - 1:
+				# playing to not lose
+				for idx in combo.indices:
+					if self.board[idx] == ' ':
+						move = idx
+						found = True
+						break
+			elif combo.comp_count == self.size - 1:
+				# playing to win
+				for idx in combo.indices:
+					if self.board[idx] == ' ':
+						move = idx
+						found = True
+						break
+			if found:
+				self.make_move(move)
+				return True
+		return False
+
+	def first_comp_move(self):
+		mul = (self.size - 1) / 2
+		center = (self.size * mul) + mul
+		center = int(center)
+		if self.is_open(center):
+			self.make_move(center)
+		else:
+			corners = [0, (self.size - 1), (self.size * (self.size - 1)),
+			           ((self.size + 1) * (self.size - 1))]
+			for corner in corners:
+				if self.is_open(corner):
+					self.make_move(corner)
+					break
+
 	def make_comp_move(self):
 		self.combo_queue.sort(reverse=True)
 		print("SORTED:")
 		for combo in self.combo_queue:
 			print(combo)
-		if self.moves > 1:
-			move = 0
-			found = False
-			# winning moves
-			for combo in self.combo_queue:
-				if combo.user_count == self.size - 1:
-					# playing to not lose
-					for idx in combo.indices:
-						if self.board[idx] == ' ':
-							move = idx
-							found = True
-							break
-				elif combo.comp_count == self.size - 1:
-					# playing to win
-					for idx in combo.indices:
-						if self.board[idx] == ' ':
-							move = idx
-							found = True
-							break
-				if found:
-					self.make_move(move)
-					break
-
-			if not found:
+		if self.moves > 1:			
+			winning_move = self.make_winning_move()
+			if not winning_move:
+				found = False
 				for combo in self.combo_queue:
 					for idx in combo.indices:
 						if self.board[idx] == ' ':
@@ -135,18 +162,7 @@ class TicTacToeBoard:
 						self.make_move(move)
 						break
 		else:
-			mul = (self.size - 1) / 2
-			center = (self.size * mul) + mul
-			center = int(center)
-			if self.is_open(center):
-				self.make_move(center)
-			else:
-				corners = [0, (self.size - 1), (self.size * (self.size - 1)),
-				           ((self.size + 1) * (self.size - 1))]
-				for corner in corners:
-					if self.is_open(corner):
-						self.make_move(corner)
-						break
+			self.first_comp_move()
 
 	def check_input(self, move):
 		"""Return whether or not the user input has valid length, row, column
