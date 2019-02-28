@@ -90,6 +90,12 @@ class TicTacToeBoard:
 		self.moves += 1
 		self.print_board()
 
+	def make_user_move(self, move):
+		int_row = int(move[0]) - 1 
+		int_col = ord(move[1]) - 97
+		position = (int_row * self.size) + int_col
+		self.make_move(position)
+
 	def make_comp_move(self):
 		self.combo_queue.sort(reverse=True)
 		print("SORTED:")
@@ -272,10 +278,7 @@ def play_game(length):
 						print('Goodbye')
 						return
 					if board.check_input(move):
-						int_row = int(move[0]) - 1 
-						int_col = ord(move[1]) - 97
-						position = (int_row * board.size) + int_col
-						board.make_move(position)
+						board.make_user_move(move)
 						winner = board.check_for_winner()
 						board.player = 'O'
 				except KeyboardInterrupt:
