@@ -25,7 +25,6 @@ class TicTacToeBoard:
 	def __init__(self, length):
 		self.size = length
 		self.moves = 0
-		self.start = True
 		self.player = 'O'
 		self.user_score = 0
 		self.comp_score = 0
@@ -74,6 +73,16 @@ class TicTacToeBoard:
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
+
+	def choose_starter(self):
+		"""randomly choose starting player"""
+		starter = random.randint(0, 1)
+		if starter == 0:
+			print("Computer starts!")
+			board.player = 'O'
+		else:
+			print("You start!")
+			board.player = 'X'
 
 	def make_move(self, move):
 		"""Make the player's move on the game board. X=user, O=computer."""
@@ -213,7 +222,6 @@ class TicTacToeBoard:
 		play_again = input('Play again? (Y/N): ')
 		if play_again == 'Y' or play_again == 'y':
 			self.moves = 0
-			self.start = True
 			self.player = 'O'
 			self.board = [' '] * (self.size * self.size)
 			self.print_board()
@@ -268,68 +276,56 @@ class TicTacToeBoard:
 def play_game(board):
 	"""Play a game of tic-tac-toe against the user."""
 	while True:
-		if not board.start:
-			winner = ' '
-			# user's turn
-			if board.player == 'X':
-				try:
-					move = input('Your turn\n'\
-						         'Enter a position: ')
-					move = move.lower()
-					if move == 'exit':
-						print('Goodbye')
-						return
-					if board.check_input(move):
-						board.make_user_move(move)
-						winner = board.check_for_winner()
-						board.player = 'O'
-				except KeyboardInterrupt:
-					print('\nGoodbye')
-					return
-			else:
-				# randomly choose spot, then linear probe
-				board.make_comp_move()
-				winner = board.check_for_winner()
-				board.player = 'X'
-
-			if winner != ' ':
-				# user wins
-				if winner == 'X':
-					print('Winner: X (you)\n'\
-						  'Congratulations, you won!')
-					board.user_score += 1
-				# computer wins
-				if winner == 'O':
-					print('Winner: O (computer)\n'\
-						  'Sorry, you lost. Better luck next time.')
-					board.comp_score += 1
-				# tie game
-				if winner == 'C':
-					print("Winner: It's a tie!\n"\
-						  "Better luck next time.")
-
-				board.print_scores()
-
-				try:
-					if board.play_again():
-						continue
-				except KeyboardInterrupt:
-					print('\nGoodbye')
-					return
-				else:
+		winner = ' '
+		# user's turn
+		if board.player == 'X':
+			try:
+				move = input('Your turn\n'\
+					         'Enter a position: ')
+				move = move.lower()
+				if move == 'exit':
 					print('Goodbye')
 					return
-		# first move (start = True)
+				if board.check_input(move):
+					board.make_user_move(move)
+					winner = board.check_for_winner()
+					board.player = 'O'
+			except KeyboardInterrupt:
+				print('\nGoodbye')
+				return
 		else:
-			# randomly choose starting player
-			starter = random.randint(0, 1)
-			board.start = False
-			if starter == 0:
-				print("Computer starts!")
-				board.player = 'O'
+			# randomly choose spot, then linear probe
+			board.make_comp_move()
+			winner = board.check_for_winner()
+			board.player = 'X'
+
+		if winner != ' ':
+			# user wins
+			if winner == 'X':
+				print('Winner: X (you)\n'\
+					  'Congratulations, you won!')
+				board.user_score += 1
+			# computer wins
+			if winner == 'O':
+				print('Winner: O (computer)\n'\
+					  'Sorry, you lost. Better luck next time.')
+				board.comp_score += 1
+			# tie game
+			if winner == 'C':
+				print("Winner: It's a tie!\n"\
+					  "Better luck next time.")
+
+			board.print_scores()
+
+			try:
+				if board.play_again():
+					continue
+			except KeyboardInterrupt:
+				print('\nGoodbye')
+				return
 			else:
-				print("You start!")
-				board.player = 'X'
+				print('Goodbye')
+				return
 
 
 def print_welcome():
@@ -358,4 +354,5 @@ if __name__ == '__main__':
 	board = TicTacToeBoard(length)
 	print_welcome()
 	board.print_board()
+	board.choose_starter()
 	play_game(3)
