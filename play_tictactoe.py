@@ -1,5 +1,17 @@
 import random
 
+class WinCombo:
+
+	def __init__(self, combo):
+		self.user_count = 0
+		self.comp_count = 0
+		self.indices = combo
+
+	def __gt__(self, other):
+		if self.comp_count > other.comp_count:
+			return True
+
+
 class TicTacToeBoard:
 
 	def __init__(self, length):
@@ -12,7 +24,7 @@ class TicTacToeBoard:
 		self.board = [' '] * (self.size * self.size)
 
 		self.win_combos = []
-		self.combo_dict = {}
+		self.combo_queue = []
 		# winning rows
 		for row in range(0, self.size):
 			columns = []
@@ -20,7 +32,8 @@ class TicTacToeBoard:
 				columns.append((row * self.size) + col)
 			tpl = tuple(columns)
 			self.win_combos.append(tpl)
-			self.combo_dict[tpl] = [0,0]
+			combo = WinCombo(tpl)
+			self.combo_queue.append(combo)
 
 		# winning columns
 		for col in range(0, self.size):
@@ -29,7 +42,8 @@ class TicTacToeBoard:
 				rows.append(col + (row * self.size))
 			tpl = tuple(rows)
 			self.win_combos.append(tpl)
-			self.combo_dict[tpl] = [0,0]
+			combo = WinCombo(tpl)
+			self.combo_queue.append(combo)
 
 		# winning diags
 		diag1 = []
@@ -39,7 +53,8 @@ class TicTacToeBoard:
 			i += 1
 		tpl = tuple(diag1)
 		self.win_combos.append(tpl)
-		self.combo_dict[tpl] = [0,0]
+		combo = WinCombo(tpl)
+		self.combo_queue.append(combo)
 
 		diag2 = []
 		j = 0
@@ -48,7 +63,8 @@ class TicTacToeBoard:
 			j += 1
 		tpl = tuple(diag2)
 		self.win_combos.append(tpl)
-		self.combo_dict[tpl] = [0,0]
+		combo = WinCombo(tpl)
+		self.combo_queue.append(combo)
 
 	def make_move(self, move):
 		"""Make the player's move on the game board. X=user, O=computer."""
@@ -57,36 +73,40 @@ class TicTacToeBoard:
 		else:
 			print('Your turn')
 
-		for combo in self.combo_dict.keys():
-			if move in combo:
+		for i in range(0, len(self.combo_queue)):
+			if move in self.combo_queue[i].indices:
 				if self.player == 'O':
-					print("Computer's turn")
-					self.combo_dict[combo][0] += 1
+					self.combo_queue[i].comp_count += 1
 				else:
-					print("Your turn")
-					self.combo_dict[combo][1] += 1
+					self.combo_queue[i].user_count += 1
 		self.board[move] = self.player
 		self.moves += 1
 		self.print_board()
 
 	def make_comp_move(self):
-		# make move to win
+		self.combo_queue.sort()
+		# made_move = False
 		if self.moves > 1:
-			count = 0
 			move = 0
-			for combo in self.win_combos:
-				# only combos with no user moves
-				if self.combo_dict[combo][1] == 0:
-					# winning move
-					if self.combo_dict[combo][0] == self.size - 1:
-						for idx in combo:
-							if self.board[idx] == ' ':
-								self.make_move(idx)
-								break
-
-
-
-
+			found = False
+			for combo in self.combo_queue:
+				if combo.user_count == 0:
+					# playing to win
+					for idx in combo.indices:
+						if self.board[idx] == ' ':
+							move = idx
+							found = True
+							break
+				elif combo.user_count == self.size - 1:
+					# playing to not lose
+					for idx in combo.indices:
+						if self.board[idx] == ' ':
+							move = idx
+							found = True
+							break
+				if found:
+					self.make_move(move)
+					break
 		else:
 			mul = (self.size - 1) / 2
 			center = (self.size * mul) + mul
@@ -96,17 +116,12 @@ class TicTacToeBoard:
 			else:
 				corners = [0, (self.size - 1), (self.size * (self.size - 1)),
 				           ((self.size + 1) * (self.size - 1))]
-				moved = False
 				for corner in corners:
 					if self.is_open(corner):
 						self.make_move(corner)
-						moved = True
+						# made_move = True
 						break
-				if not moved:
-					# other
-					pass
 
-		# self.moves += 1
 		winner = self.check_for_winner()
 		self.player = 'X'
 
