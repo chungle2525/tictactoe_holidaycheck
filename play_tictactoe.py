@@ -65,7 +65,13 @@ class TicTacToeBoard:
 			count = 0
 			move = 0
 			for combo in self.win_combos:
-				
+				# only combos with no user moves
+				if self.combo_dict[combo][1] == 0:
+					if self.combo_dict[combo][0] == self.size - 1:
+						for idx in combo:
+							if self.board[idx] == ' ':
+								self.make_move(idx)
+								break
 
 
 		else:
