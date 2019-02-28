@@ -351,8 +351,8 @@ def print_welcome():
 
 if __name__ == '__main__':
 	# hardcoded game dimension of size 3
-	board = TicTacToeBoard(length)
+	board = TicTacToeBoard(3)
 	print_welcome()
 	board.print_board()
 	board.choose_starter()
-	play_game(3)
+	play_game(board)
