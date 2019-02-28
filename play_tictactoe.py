@@ -30,7 +30,7 @@ class TicTacToeBoard:
 		diag1 = []
 		i = 0
 		while i < self.size:
-			diag1.append((i * self.size) + i)
+			diag1.append((i) * (self.size + 1))
 			i += 1
 		self.win_combos.append(diag1)
 
