@@ -51,18 +51,32 @@ class TicTacToeBoard:
 		self.print_board()
 
 	def make_comp_move(self):
-		mul = self.size / 2
+		mul = (self.size - 1) / 2
 		center = (self.size * mul) + mul
+		center = int(center)
+
 		if self.is_open(center):
 			self.make_move(center)
+		else:
+			corners = [0, (self.size - 1), (self.size * (self.size - 1)),
+			           ((self.size + 1) * (self.size - 1))]
+			moved = False
+			for corner in corners:
+				if self.is_open(corner):
+					self.make_move(corner)
+					moved = True
+					break
+			if not moved:
+				# other
+				pass
 
 		self.moves += 1
 		winner = self.check_for_winner()
 		self.player = 'X'
 
 	def check_input(self, move):
-		"""Return whether or not the user input has valid length, row, column and
-		   position.
+		"""Return whether or not the user input has valid length, row, column
+		   and position.
 		"""
 		if len(move) == 2:
 			if not move[0].isdigit(): # first char must be digit
