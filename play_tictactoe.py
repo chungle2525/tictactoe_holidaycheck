@@ -1,30 +1,175 @@
 import random
 
-def play_game():
-	"""Play a game of tic-tac-toe against the user."""
-	print_welcome()
-	# initialize the board array of size 9. '-' indicates an empty spot
-	board = ['-', '-', '-', '-', '-', '-', '-', '-', '-']
-	computer_score = 0
-	user_score = 0
-	print_board(board)
-	num_moves = 0
-	winning_combinations = [(0, 1, 2),
-							(3, 4, 5),
-							(6, 7, 8),
-							(0, 3, 6),
-							(1, 4, 7),
-							(2, 5, 8),
-							(0, 4, 8),
-							(2, 4, 6)]
+class TicTacToeBoard:
 
-	start = True
-	player = 'O'
+	def __init__(self, length):
+		self.size = length
+		self.moves = 0
+		self.start = True
+		self.player = 'O'
+		self.user_score = 0
+		self.comp_score = 0
+		self.board = [' '] * (self.size * self.size)
+
+		self.win_combos = []
+		# winning rows
+		for row in range(0, self.size):
+			columns = []
+			for col in range(0, self.size):
+				columns.append((row * self.size) + col)
+			self.win_combos.append(columns)
+
+		# winning columns
+		for col in range(0, self.size):
+			rows = []
+			for row in range(0, self.size):
+				rows.append(col + (row * self.size))
+			self.win_combos.append(rows)
+
+		# winning diags
+		diag1 = []
+		i = 0
+		while i < self.size:
+			diag1.append((i * self.size) + i)
+			i += 1
+		self.win_combos.append(diag1)
+
+		diag2 = []
+		j = 0
+		while j < self.size:
+			diag2.append((j + 1) * (self.size - 1))
+			j += 1
+		self.win_combos.append(diag2)
+
+	def make_move(self, move):
+		"""Make the player's move on the game board. X=user, O=computer."""
+		if self.player == 'O':
+			print("Computer's turn")
+		else:
+			print('Your turn')
+		self.board[move] = self.player
+		self.print_board()
+
+	def check_input(self, move):
+		"""Return whether or not the user input has valid length, row, column and
+		   position.
+		"""
+		if len(move) == 2:
+			if not move[0].isdigit(): # first char must be digit
+				print('Oops, you entered an invalid row.')
+				return False
+			int_row = int(move[0]) - 1
+			# check for valid row
+			if int_row >= self.size or int_row < 0:
+				print('Oops, you entered an invalid row.')
+				return False
+			# check for valid column
+			col = move[1]
+			int_col = ord(col) - 97
+			if int_col >= self.size or int_col < 0:
+				print('Oops, you entered an invalid column.')
+				return False
+			# check that position is available
+			if not self.open_spot((self.size * int_row) + int_col):
+				print('Oops, that position is taken.')
+				return False
+			return True
+		print('Invalid input.')
+		return False
+
+	def check_for_winner(self):
+		"""Check if player has acquired a winning combination.
+		   If so, return player. Otherwise, return ' '.
+	    """
+		for combo in self.win_combos:
+			current = True
+			for idx in combo:
+				if self.board[idx] != self.player:
+					current = False
+					break
+			if current:
+				return self.player
+
+		# if no winner is found and board is full, it is a Cat's game (tie)
+		if self.moves == (self.size * self.size):
+			return 'C'
+		return ' '
+
+	def print_scores(self):
+		"""Print the total score of the user and the computer.
+		   Scores reset if the user exits the program.
+		"""
+		print('\n*SCORES:\n'\
+			  '*You: ' + str(self.user_score) + '\n'\
+			  '*Computer: ' + str(self.comp_score) + '\n')
+
+	def play_again(self):
+		"""Return whether or not the user wants to play another game.
+		   If so, reset the board attributes.
+		"""
+		play_again = input('Play again? (Y/N): ')
+		if play_again == 'Y' or play_again == 'y':
+			self.moves = 0
+			self.start = True
+			self.player = 'O'
+			self.board = [' '] * (self.size * self.size)
+			self.print_board()
+			return True
+		return False
+
+	def open_spot(self, move):
+		if self.board[move] == ' ':
+			return True
+		return False
+
+	def print_board(self):
+		"""Print the current state of the game board.
+		   Spots taken by the user are represented by 'X'.
+		   Spots taken by the computer are represented by 'O'.
+		"""
+		board_str = ''
+		start_ascii = ord('A')
+		board_str += '      A'
+		for i in range(1, self.size):
+			board_str += '         ' + chr(start_ascii + i)
+		board_str += '\n'
+
+		for row in range(0, self.size):
+			board_str += '           '
+			for col in range(0, self.size - 1):
+				board_str += '|         '
+			board_str += '\n'
+
+			board_str += str(row + 1) + ' '
+			for col in range(0, self.size):
+				index = (self.size * row) + col
+				board_str += ('    %s    |' % self.board[index])
+			board_str = board_str[:-1]
+			board_str += '\n'
+			board_str += '           '
+			for col in range(0, self.size - 1):
+				board_str += '|         '
+			board_str += '\n'
+
+			if row < self.size - 1:
+				board_str += '  '
+				board_str += '-' * ((self.size * 10) - 2)
+				board_str += '\n'
+
+		print(board_str + '\n')
+
+
+def play_game(length):
+	"""Play a game of tic-tac-toe against the user."""
+	board = TicTacToeBoard(length)
+	print_welcome()
+	board.print_board()
+
 	while True:
-		if not start:
-			winner = '-'
+		if not board.start:
+			winner = ' '
 			# user's turn
-			if player == 'X':
+			if board.player == 'X':
 				try:
 					move = input('Your turn\n'\
 						         'Enter a position: ')
@@ -32,56 +177,53 @@ def play_game():
 					if move == 'exit':
 						print('Goodbye')
 						return
-					if check_input(move, board):
-						int_row = int(move[0]) - 1
+					if board.check_input(move):
+						int_row = int(move[0]) - 1 
 						int_col = ord(move[1]) - 97
-						position = (int_row * 3) + int_col
-						make_move(player, position, board)
-						num_moves += 1
-						winner = check_for_winner(num_moves, player, board,
-					                      winning_combinations)
-						player = 'O'
+						position = (int_row * board.size) + int_col
+						board.make_move(position)
+						board.moves += 1
+						winner = board.check_for_winner()
+						board.player = 'O'
 				except KeyboardInterrupt:
 					print('\nGoodbye')
 					return
 			else:
-				# if random index is taken, search iteratively for open spot
-				random_idx = random.randint(0, 8)
-				if board[random_idx] != '-':
-					for adder in range(1, 9):
-						new_idx = (random_idx + adder) % 9
-						if board[new_idx] == '-':
-							random_idx = new_idx
+				# randomly choose spot, then linear probe
+				size = board.size
+				size = size * size
+				compmove = random.randint(0, (size - 1))
+				if not board.open_spot(compmove):
+					for adder in range(1, size):
+						new_idx = (compmove + adder) % size
+						if board.board[new_idx] == ' ':
+							compmove = new_idx
 							break
-				make_move(player, random_idx, board)
-				num_moves += 1
-				# check for winner
-				winner = check_for_winner(num_moves, player, board,
-				                      winning_combinations)
-				player = 'X'
+				board.make_move(compmove)
+				board.moves += 1
+				winner = board.check_for_winner()
+				board.player = 'X'
 
-			if winner != '-':
+			if winner != ' ':
 				# user wins
 				if winner == 'X':
 					print('Winner: X (you)\n'\
 						  'Congratulations, you won!')
-					user_score += 1
+					board.user_score += 1
 				# computer wins
 				if winner == 'O':
 					print('Winner: O (computer)\n'\
 						  'Sorry, you lost. Better luck next time.')
-					computer_score += 1
+					board.comp_score += 1
 				# tie game
 				if winner == 'C':
 					print("Winner: It's a tie!\n"\
 						  "Better luck next time.")
-				
-				print_scores(user_score, computer_score)
+
+				board.print_scores()
 
 				try:
-					if play_again(board):
-						num_moves = 0
-						start = True
+					if board.play_again():
 						continue
 				except KeyboardInterrupt:
 					print('\nGoodbye')
@@ -89,122 +231,17 @@ def play_game():
 				else:
 					print('Goodbye')
 					return
-		# first move
+		# first move (start = True)
 		else:
 			# randomly choose starting player
 			starter = random.randint(0, 1)
-			start = False
+			board.start = False
 			if starter == 0:
 				print("Computer starts!")
-				player = 'O'
+				board.player = 'O'
 			else:
 				print("You start!")
-				player = 'X'
-
-
-def check_input(move, board):
-	"""Return whether or not the user input has valid length, row, column and
-	   position.
-	"""
-	if len(move) == 2:
-		if not move[0].isdigit():
-			print('Oops, you entered an invalid row.')
-			return False
-		int_row = int(move[0]) - 1
-		# check for valid row
-		if int_row != 0 and int_row != 1 and int_row != 2:
-			print('Oops, you entered an invalid row.')
-			return False
-		# check for valid column
-		col = move[1]
-		if col != 'a' and col != 'b' and col != 'c':
-			print('Oops, you entered an invalid column.')
-			return False
-		int_col = ord(col) - 97
-		# check that position is available
-		if board[(3 * int_row) + int_col] != '-':
-			print('Oops, that position is taken.')
-			return False
-		return True
-	print('Invalid input.')
-	return False
-
-
-def make_move(player, move, board):
-	"""Make the player's move on the game board. X=user, O=computer."""
-	if player == 'O':
-		print("Computer's turn")
-		board[move] = 'O'
-	else:
-		print('Your turn')
-		board[move] = 'X'
-
-	print_board(board)
-
-
-def check_for_winner(moves, player, board, winning_combos):
-	"""Check if player has acquired a winning combination.
-	   If so, return player. Otherwise, return '-'.
-    """
-	for combo in winning_combos:
-		if (board[combo[0]] == player and board[combo[1]] == player and
-			board[combo[2]] == player):
-			return player
-
-	# if no winner is found and board is full, it is a Cat's game (tie)
-	if moves == 9:
-		return 'C'
-
-	return '-'
-
-
-def print_scores(user_score, comp_score):
-	"""Print the total score of the user and the computer.
-	   Scores reset if the user exits the program.
-	"""
-	print('\n*SCORES:\n'\
-		  '*You: ' + str(user_score) + '\n'\
-		  '*Computer: ' + str(comp_score) + '\n')
-
-
-def play_again(board):
-	"""Return whether or not the user wants to play another game.
-	   If True, reset the board to contain all empty positions.
-	"""
-	play_again = input('Play again? (Y/N): ')
-	if play_again == 'Y' or play_again == 'y':
-		# reset board positions
-		board[:] = ['-', '-', '-', '-', '-', '-', '-', '-', '-']
-		print_board(board)
-		return True
-	return False
-
-
-def print_board(board):
-	"""Print the current state of the game board.
-	   Spots taken by the user are represented by 'X'.
-	   Spots taken by the computer are represented by 'O'.
-	"""
-	board_str = '      A         B         C\n'
-	for row in range(0, 3):
-		board_str += '           |         |         \n'
-		# print player if spot is taken
-		col_a = ' '
-		col_b = ' '
-		col_c = ' '
-		if board[(3 * row)] != '-':
-			col_a = board[(3 * row)]
-		if board[(3 * row) + 1] != '-':
-			col_b = board[(3 * row) + 1]
-		if board[(3 * row) + 2] != '-':
-			col_c = board[(3 * row) + 2]
-
-		board_str += ('%c     %s    |    %s    |    %s    \n'
-			          % (str(row + 1), col_a, col_b, col_c))
-		board_str += '           |         |         \n'
-		if row < 2:
-			board_str += '  -------------------------------\n'
-	print(board_str + '\n')
+				board.player = 'X'
 
 
 def print_welcome():
@@ -229,4 +266,5 @@ def print_welcome():
 
 
 if __name__ == '__main__':
-	play_game()
+	# hardcoded game dimension of size 3
+	play_game(3)
