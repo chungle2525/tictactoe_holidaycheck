@@ -10,6 +10,13 @@ class WinCombo:
 	def __gt__(self, other):
 		if self.comp_count > other.comp_count:
 			return True
+		if self.comp_count == other.comp_count:
+			if self.user_count > other.user_count:
+				return True
+		return False
+
+	def __str__(self):
+		return ("INDICES: " + str(self.indices) + (" USER: %d, COMP: %d" % (self.user_count, self.comp_count)))
 
 
 class TicTacToeBoard:
@@ -84,21 +91,24 @@ class TicTacToeBoard:
 		self.print_board()
 
 	def make_comp_move(self):
-		self.combo_queue.sort()
-		# made_move = False
+		self.combo_queue.sort(reverse=True)
+		print("SORTED:")
+		for combo in self.combo_queue:
+			print(combo)
 		if self.moves > 1:
 			move = 0
 			found = False
+			# winning moves
 			for combo in self.combo_queue:
-				if combo.user_count == 0:
-					# playing to win
+				if combo.user_count == self.size - 1:
+					# playing to not lose
 					for idx in combo.indices:
 						if self.board[idx] == ' ':
 							move = idx
 							found = True
 							break
-				elif combo.user_count == self.size - 1:
-					# playing to not lose
+				elif combo.comp_count == self.size - 1:
+					# playing to win
 					for idx in combo.indices:
 						if self.board[idx] == ' ':
 							move = idx
@@ -107,6 +117,17 @@ class TicTacToeBoard:
 				if found:
 					self.make_move(move)
 					break
+
+			if not found:
+				for combo in self.combo_queue:
+					for idx in combo.indices:
+						if self.board[idx] == ' ':
+							move = idx
+							found = True
+							break
+					if found:
+						self.make_move(move)
+						break
 		else:
 			mul = (self.size - 1) / 2
 			center = (self.size * mul) + mul
@@ -119,11 +140,7 @@ class TicTacToeBoard:
 				for corner in corners:
 					if self.is_open(corner):
 						self.make_move(corner)
-						# made_move = True
 						break
-
-		winner = self.check_for_winner()
-		self.player = 'X'
 
 	def check_input(self, move):
 		"""Return whether or not the user input has valid length, row, column
@@ -164,7 +181,6 @@ class TicTacToeBoard:
 					break
 			if current:
 				return self.player
-
 		# if no winner is found and board is full, it is a Cat's game (tie)
 		if self.moves == (self.size * self.size):
 			return 'C'
@@ -189,6 +205,9 @@ class TicTacToeBoard:
 			self.player = 'O'
 			self.board = [' '] * (self.size * self.size)
 			self.print_board()
+			for combo in self.combo_queue:
+				combo.user_count = 0
+				combo.comp_count = 0
 			return True
 		return False
 
@@ -257,7 +276,6 @@ def play_game(length):
 						int_col = ord(move[1]) - 97
 						position = (int_row * board.size) + int_col
 						board.make_move(position)
-						# board.moves += 1
 						winner = board.check_for_winner()
 						board.player = 'O'
 				except KeyboardInterrupt:
@@ -266,6 +284,8 @@ def play_game(length):
 			else:
 				# randomly choose spot, then linear probe
 				board.make_comp_move()
+				winner = board.check_for_winner()
+				board.player = 'X'
 
 			if winner != ' ':
 				# user wins
