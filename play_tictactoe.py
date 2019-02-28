@@ -56,7 +56,17 @@ class TicTacToeBoard:
 			print("Computer's turn")
 		else:
 			print('Your turn')
+
+		for combo in self.combo_dict.keys():
+			if move in combo:
+				if self.player == 'O':
+					print("Computer's turn")
+					self.combo_dict[combo][0] += 1
+				else:
+					print("Your turn")
+					self.combo_dict[combo][1] += 1
 		self.board[move] = self.player
+		self.moves += 1
 		self.print_board()
 
 	def make_comp_move(self):
@@ -67,11 +77,14 @@ class TicTacToeBoard:
 			for combo in self.win_combos:
 				# only combos with no user moves
 				if self.combo_dict[combo][1] == 0:
+					# winning move
 					if self.combo_dict[combo][0] == self.size - 1:
 						for idx in combo:
 							if self.board[idx] == ' ':
 								self.make_move(idx)
 								break
+
+
 
 
 		else:
@@ -93,7 +106,7 @@ class TicTacToeBoard:
 					# other
 					pass
 
-		self.moves += 1
+		# self.moves += 1
 		winner = self.check_for_winner()
 		self.player = 'X'
 
@@ -229,7 +242,7 @@ def play_game(length):
 						int_col = ord(move[1]) - 97
 						position = (int_row * board.size) + int_col
 						board.make_move(position)
-						board.moves += 1
+						# board.moves += 1
 						winner = board.check_for_winner()
 						board.player = 'O'
 				except KeyboardInterrupt:
