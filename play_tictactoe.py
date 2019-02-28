@@ -9,7 +9,6 @@ class TicTacToeBoard:
 		self.player = 'O'
 		self.user_score = 0
 		self.comp_score = 0
-		self.comp_moves = []
 		self.board = [' '] * (self.size * self.size)
 
 		self.win_combos = []
@@ -52,17 +51,10 @@ class TicTacToeBoard:
 		self.print_board()
 
 	def make_comp_move(self):
-		size = self.size
-		size = size * size
-		compmove = random.randint(0, (size - 1))
-		if not self.open_spot(compmove):
-			for adder in range(1, size):
-				new_idx = (compmove + adder) % size
-				if self.open_spot(new_idx):
-					compmove = new_idx
-					break
-		self.make_move(compmove)
-		self.comp_moves.append(compmove)
+		mul = self.size / 2
+		center = (self.size * mul) + mul
+		if self.is_open(center):
+			self.make_move(center)
 
 		self.moves += 1
 		winner = self.check_for_winner()
@@ -88,7 +80,7 @@ class TicTacToeBoard:
 				print('Oops, you entered an invalid column.')
 				return False
 			# check that position is available
-			if not self.open_spot((self.size * int_row) + int_col):
+			if not self.is_open((self.size * int_row) + int_col):
 				print('Oops, that position is taken.')
 				return False
 			return True
@@ -135,7 +127,7 @@ class TicTacToeBoard:
 			return True
 		return False
 
-	def open_spot(self, move):
+	def is_open(self, move):
 		if self.board[move] == ' ':
 			return True
 		return False
