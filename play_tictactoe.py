@@ -34,7 +34,7 @@ class TicTacToeBoard:
 		self.comp_score = 0
 		self.board = [' '] * (self.size * self.size)
 
-		self.win_combos = []
+		# self.win_combos = []
 		self.combo_queue = []
 		# winning rows
 		combo_count = 0
@@ -43,7 +43,7 @@ class TicTacToeBoard:
 			for col in range(0, self.size):
 				columns.append((row * self.size) + col)
 			tpl = tuple(columns)
-			self.win_combos.append(tpl)
+			# self.win_combos.append(tpl)
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
@@ -54,7 +54,7 @@ class TicTacToeBoard:
 			for row in range(0, self.size):
 				rows.append(col + (row * self.size))
 			tpl = tuple(rows)
-			self.win_combos.append(tpl)
+			# self.win_combos.append(tpl)
 			combo = WinCombo(combo_count, tpl)
 			combo_count += 1
 			self.combo_queue.append(combo)
@@ -66,7 +66,7 @@ class TicTacToeBoard:
 			diag1.append((i) * (self.size + 1))
 			i += 1
 		tpl = tuple(diag1)
-		self.win_combos.append(tpl)
+		# self.win_combos.append(tpl)
 		combo = WinCombo(combo_count, tpl)
 		combo_count += 1
 		self.combo_queue.append(combo)
@@ -77,7 +77,7 @@ class TicTacToeBoard:
 			diag2.append((j + 1) * (self.size - 1))
 			j += 1
 		tpl = tuple(diag2)
-		self.win_combos.append(tpl)
+		# self.win_combos.append(tpl)
 		combo = WinCombo(combo_count, tpl)
 		combo_count += 1
 		self.combo_queue.append(combo)
@@ -145,9 +145,6 @@ class TicTacToeBoard:
 
 	def make_comp_move(self):
 		self.combo_queue.sort(reverse=True)
-		print("SORTED:")
-		for combo in self.combo_queue:
-			print(combo)
 		if self.moves > 1:			
 			winning_move = self.make_winning_move()
 			if not winning_move:
@@ -195,9 +192,10 @@ class TicTacToeBoard:
 		"""Check if player has acquired a winning combination.
 		   If so, return player. Otherwise, return ' '.
 	    """
-		for combo in self.win_combos:
+		# for combo in self.win_combos:
+		for combo in self.combo_queue:
 			current = True
-			for idx in combo:
+			for idx in combo.indices:
 				if self.board[idx] != self.player:
 					current = False
 					break
