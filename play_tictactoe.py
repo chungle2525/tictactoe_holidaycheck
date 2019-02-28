@@ -12,19 +12,24 @@ class TicTacToeBoard:
 		self.board = [' '] * (self.size * self.size)
 
 		self.win_combos = []
+		self.combo_dict = {}
 		# winning rows
 		for row in range(0, self.size):
 			columns = []
 			for col in range(0, self.size):
 				columns.append((row * self.size) + col)
-			self.win_combos.append(tuple(columns))
+			tpl = tuple(columns)
+			self.win_combos.append(tpl)
+			self.combo_dict[tpl] = [0,0]
 
 		# winning columns
 		for col in range(0, self.size):
 			rows = []
 			for row in range(0, self.size):
 				rows.append(col + (row * self.size))
-			self.win_combos.append(tuple(rows))
+			tpl = tuple(rows)
+			self.win_combos.append(tpl)
+			self.combo_dict[tpl] = [0,0]
 
 		# winning diags
 		diag1 = []
@@ -32,14 +37,18 @@ class TicTacToeBoard:
 		while i < self.size:
 			diag1.append((i) * (self.size + 1))
 			i += 1
-		self.win_combos.append(tuple(diag1))
+		tpl = tuple(diag1)
+		self.win_combos.append(tpl)
+		self.combo_dict[tpl] = [0,0]
 
 		diag2 = []
 		j = 0
 		while j < self.size:
 			diag2.append((j + 1) * (self.size - 1))
 			j += 1
-		self.win_combos.append(tuple(diag2))
+		tpl = tuple(diag2)
+		self.win_combos.append(tpl)
+		self.combo_dict[tpl] = [0,0]
 
 	def make_move(self, move):
 		"""Make the player's move on the game board. X=user, O=computer."""
@@ -51,24 +60,32 @@ class TicTacToeBoard:
 		self.print_board()
 
 	def make_comp_move(self):
-		mul = (self.size - 1) / 2
-		center = (self.size * mul) + mul
-		center = int(center)
+		# make move to win
+		if self.moves > 1:
+			count = 0
+			move = 0
+			for combo in self.win_combos:
+				
 
-		if self.is_open(center):
-			self.make_move(center)
+
 		else:
-			corners = [0, (self.size - 1), (self.size * (self.size - 1)),
-			           ((self.size + 1) * (self.size - 1))]
-			moved = False
-			for corner in corners:
-				if self.is_open(corner):
-					self.make_move(corner)
-					moved = True
-					break
-			if not moved:
-				# other
-				pass
+			mul = (self.size - 1) / 2
+			center = (self.size * mul) + mul
+			center = int(center)
+			if self.is_open(center):
+				self.make_move(center)
+			else:
+				corners = [0, (self.size - 1), (self.size * (self.size - 1)),
+				           ((self.size + 1) * (self.size - 1))]
+				moved = False
+				for corner in corners:
+					if self.is_open(corner):
+						self.make_move(corner)
+						moved = True
+						break
+				if not moved:
+					# other
+					pass
 
 		self.moves += 1
 		winner = self.check_for_winner()
