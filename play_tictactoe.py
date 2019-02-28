@@ -60,27 +60,28 @@ class TicTacToeBoard:
 			self.combo_queue.append(combo)
 
 		# winning diags
-		diag1 = []
-		i = 0
-		while i < self.size:
-			diag1.append((i) * (self.size + 1))
-			i += 1
-		tpl = tuple(diag1)
-		# self.win_combos.append(tpl)
-		combo = WinCombo(combo_count, tpl)
-		combo_count += 1
-		self.combo_queue.append(combo)
+		if self.size > 1:
+			diag1 = []
+			i = 0
+			while i < self.size:
+				diag1.append((i) * (self.size + 1))
+				i += 1
+			tpl = tuple(diag1)
+			# self.win_combos.append(tpl)
+			combo = WinCombo(combo_count, tpl)
+			combo_count += 1
+			self.combo_queue.append(combo)
 
-		diag2 = []
-		j = 0
-		while j < self.size:
-			diag2.append((j + 1) * (self.size - 1))
-			j += 1
-		tpl = tuple(diag2)
-		# self.win_combos.append(tpl)
-		combo = WinCombo(combo_count, tpl)
-		combo_count += 1
-		self.combo_queue.append(combo)
+			diag2 = []
+			j = 0
+			while j < self.size:
+				diag2.append((j + 1) * (self.size - 1))
+				j += 1
+			tpl = tuple(diag2)
+			# self.win_combos.append(tpl)
+			combo = WinCombo(combo_count, tpl)
+			combo_count += 1
+			self.combo_queue.append(combo)
 
 	def make_move(self, move):
 		"""Make the player's move on the game board. X=user, O=computer."""
