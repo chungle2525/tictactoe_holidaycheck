@@ -80,12 +80,12 @@ class TicTacToeBoard:
 
 	def choose_starter(self):
 		"""Randomly choose starting player"""
-		# if random.randint(0, 1) == 0:
-		print("Computer starts!")
-		board.player = 'O'
-		# else:
-		# 	print("You start!")
-		# 	board.player = 'X'
+		if random.randint(0, 1) == 0:
+			print("Computer starts!")
+			board.player = 'X'
+		else:
+			print("You start!")
+			board.player = 'X'
 
 	def get_potential(self, move):
 		"""Return maximum potential winning combos for current move."""
