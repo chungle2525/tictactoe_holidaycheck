@@ -1,7 +1,6 @@
 import random
 
 class WinCombo:
-
 	def __init__(self, id_in, combo):
 		self.id = id_in
 		self.user_count = 0
@@ -18,13 +17,7 @@ class WinCombo:
 				return self.id < other.id
 		return False
 
-	def __str__(self):
-		string = ("INDICES: " + str(self.indices) + (" USER: %d, COMP: %d" % (self.user_count, self.comp_count)))
-		return string
-
-
 class TicTacToeBoard:
-
 	def __init__(self, length):
 		assert length % 2 == 1
 		self.size = length
@@ -224,7 +217,7 @@ class TicTacToeBoard:
 		# if no winner is found and board is full, it is a Cat's game (tie)
 		if self.moves == (self.size * self.size):
 			return 'C'
-		return ' '
+		return ''
 
 	def print_scores(self):
 		"""Print the total score of the user and the computer.
@@ -256,7 +249,7 @@ class TicTacToeBoard:
 		return False
 
 	def game_over(self, winner):
-		if winner != ' ':
+		if winner:
 			# user wins
 			if winner == 'X':
 				print('Winner: X (you)\n'\
@@ -322,7 +315,7 @@ class TicTacToeBoard:
 def play_game(board):
 	"""Play a game of tic-tac-toe against the user."""
 	while True:
-		winner = ' '
+		winner = ''
 		if board.player == 'X':
 			try:
 				move = input('Your turn\n'\
