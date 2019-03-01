@@ -113,8 +113,7 @@ class TicTacToeBoard:
 	def make_user_move(self, move):
 		int_row = int(move[0]) - 1 
 		int_col = ord(move[1]) - 97
-		position = (int_row * self.size) + int_col
-		self.make_move(position)
+		self.make_move((int_row * self.size) + int_col)
 
 	def first_comp_move(self):
 		"""Choose center or first corner as computer's first move"""
@@ -214,7 +213,6 @@ class TicTacToeBoard:
 					break
 			if current:
 				return self.player
-		# if no winner is found and board is full, it is a Cat's game (tie)
 		if self.moves == (self.size * self.size):
 			return 'C'
 		return ''
@@ -358,7 +356,6 @@ def print_welcome():
 		  '*  You may exit the game any time by holding Control+C\n'\
 		  '   or typing "exit".\n\n'\
 		  'Below is the empty board. Have fun!\n')
-
 
 if __name__ == '__main__':
 	# hardcoded game dimension of size 3
