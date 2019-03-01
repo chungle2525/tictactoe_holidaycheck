@@ -54,6 +54,9 @@ Once a player wins, the user has the option to exit the program or play another
 tic tac toe game. The user can exit the program at any time by typing 'exit'
 or holding Control+C.
 
+Note: The implementation supports tic tac toe boards of size n * n, where n
+      is any *odd* number.
+
 TESTS:
 I have provided the following test files:
 	* test_user_starts.py: Test cases where the user starts and tries to beat
