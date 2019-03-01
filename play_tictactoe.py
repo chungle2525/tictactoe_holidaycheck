@@ -26,6 +26,7 @@ class WinCombo:
 class TicTacToeBoard:
 
 	def __init__(self, length):
+		assert length % 2 == 1
 		self.size = length
 		self.moves = 0
 		self.player = 'O'
