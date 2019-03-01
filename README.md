@@ -53,3 +53,26 @@ possible board state in during the game:
 Once a player wins, the user has the option to exit the program or play another
 tic tac toe game. The user can exit the program at any time by typing 'exit'
 or holding Control+C.
+
+TESTS:
+I have provided the following test files:
+	* test_user_starts.py: Test cases where the user starts and tries to beat
+	  the computer.
+
+	* test_comp_starts.py: Test cases where the computer starts and tries (and
+	  succeeds) to beat the user.
+
+	The results are that the computer wins or a it is a tie game.
+
+To run tests for this program, you may type in the following commands to the
+terminal:
+> python3 test_user_starts.py > output.txt
+> python3 test_comp_starts.py > output.txt
+
+The output from play_tictactoe.py and the test files is redirected to a file
+"output.txt".
+
+If you wish to print this to the terminal, omit the "> output.txt" from the
+above commands.
+
+There will be no terminal output if all tests passed.
