@@ -16,14 +16,14 @@ def test_comp_starts_comp_wins():
 def trying_tie():
 	board = TicTacToeBoard(3)
 	board.player = 'O'
-	sys.stdin = io.StringIO("1a\n2c\n3a\n3b\nn\n")
+	sys.stdin = io.StringIO("3c\n3b\n1c\n2a\nn\n")
 	play_game(board)
 	assert board.user_score == 0
 	assert board.comp_score == 0
 
 	board = TicTacToeBoard(3)
 	board.player = 'O'
-	sys.stdin = io.StringIO("3c\n2c\n3a\n1b\nn\n")
+	sys.stdin = io.StringIO("1c\n3c\n2a\n3b\nn\n")
 	play_game(board)
 	assert board.user_score == 0
 	assert board.comp_score == 0
@@ -57,14 +57,14 @@ def adjacent_corners():
 	# right two
 	board = TicTacToeBoard(3)
 	board.player = 'O'
-	sys.stdin = io.StringIO("1c\n3c\nn\n")
+	sys.stdin = io.StringIO("1c\n3c\n3b\nn\n")
 	play_game(board)
 	assert board.user_score == 0
 	assert board.comp_score == 1
 	# bottom two
 	board = TicTacToeBoard(3)
 	board.player = 'O'
-	sys.stdin = io.StringIO("3a\n3c\nn\n")
+	sys.stdin = io.StringIO("3a\n3c\n2c\nn\n")
 	play_game(board)
 	assert board.user_score == 0
 	assert board.comp_score == 1
@@ -109,11 +109,8 @@ def trying_win():
 	assert board.user_score == 0
 	assert board.comp_score == 1
 
-def test_play_game():
-	test_comp_starts_tie()
-	test_comp_starts_comp_wins()
-
 if __name__ == "__main__":
 	print("Testing tic tac to game...")
-	test_play_game()
+	test_comp_starts_tie()
+	test_comp_starts_comp_wins()
 	print("Passed!")

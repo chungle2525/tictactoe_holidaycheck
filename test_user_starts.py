@@ -25,7 +25,7 @@ def test_corners_tie():
 	# start top left, then top right
 	board = TicTacToeBoard(3)
 	board.player = 'X'
-	sys.stdin = io.StringIO("1a\n1c\n3b\n2a\n2c\nn\n")
+	sys.stdin = io.StringIO("1a\n1c\n3b\n2a\n3c\nn\n")
 	play_game(board)
 	assert board.user_score == 0
 	assert board.comp_score == 0
