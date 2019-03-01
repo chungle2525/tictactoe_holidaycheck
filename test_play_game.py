@@ -86,6 +86,14 @@ def test_user_starts_comp_wins():
 	assert board.user_score == 0
 	assert board.comp_score == 1
 
+	# start middle, then almost win
+	board = TicTacToeBoard(3)
+	board.player = 'X'
+	sys.stdin = io.StringIO("2b\n1b\n1c\n2c\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+
 
 def test_play_game():
 	test_user_starts_tie()
