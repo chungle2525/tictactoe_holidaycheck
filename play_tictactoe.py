@@ -82,7 +82,7 @@ class TicTacToeBoard:
 		"""Randomly choose starting player"""
 		if random.randint(0, 1) == 0:
 			print("Computer starts!")
-			board.player = 'X'
+			board.player = 'O'
 		else:
 			print("You start!")
 			board.player = 'X'
@@ -106,12 +106,12 @@ class TicTacToeBoard:
 		else:
 			print('Your turn')
 
-		for i in range(0, len(self.combo_queue)):
-			if move in self.combo_queue[i].indices:
+		for combo in self.combo_queue:
+			if move in combo.indices:
 				if self.player == 'O':
-					self.combo_queue[i].comp_count += 1
+					combo.comp_count += 1
 				else:
-					self.combo_queue[i].user_count += 1
+					combo.user_count += 1
 		self.board[move] = self.player
 		self.moves += 1
 		self.print_board()
@@ -155,27 +155,26 @@ class TicTacToeBoard:
 						return True
 		return False
 
+	def highest_potential_move(self):
+		max_potential = 0
+		max_idx = 0
+		for idx in range(0, len(self.board)):
+			if self.is_open(idx):
+				ptn = self.get_potential(idx)
+				if ptn > max_potential:
+					max_potential = ptn
+					max_idx = idx
+		self.make_move(max_idx)
+
 	def make_comp_move(self):
+		"""Make a start, winning or highest potential move"""
 		self.combo_queue.sort(reverse=True)
-		# print("SORTED")
-		# for combo in self.combo_queue:
-		# 	print(combo)
 		if self.moves > 1:			
 			winning_move = self.make_winning_move()
 			if not winning_move:
 				user_has_corners = self.handle_corners()
 				if not user_has_corners:
-					# choose spot with highest potential
-					max_potential = 0
-					max_idx = 0
-					for combo in self.combo_queue:
-						for idx in combo.indices:
-							if self.is_open(idx):
-								ptn = self.get_potential(idx)
-								if ptn > max_potential:
-									max_potential = ptn
-									max_idx = idx
-					self.make_move(max_idx)
+					self.highest_potential_move()
 					return
 				else:
 					pass
@@ -187,7 +186,7 @@ class TicTacToeBoard:
 		   and position.
 		"""
 		if len(move) == 2:
-			if not move[0].isdigit(): # first char must be digit
+			if not move[0].isdigit():
 				print('Oops, you entered an invalid row.')
 				return False
 			int_row = int(move[0]) - 1
@@ -242,17 +241,44 @@ class TicTacToeBoard:
 		if play_again == 'Y' or play_again == 'y':
 			self.moves = 0
 			self.board = [' '] * (self.size * self.size)
-			self.print_board()
-			self.choose_starter()
 			for combo in self.combo_queue:
 				combo.user_count = 0
 				combo.comp_count = 0
+			self.print_board()
+			self.choose_starter()
 			return True
 		return False
 
 	def is_open(self, move):
 		if self.board[move] == ' ':
 			return True
+		return False
+
+	def game_over(self, winner):
+		if winner != ' ':
+			# user wins
+			if winner == 'X':
+				print('Winner: X (you)\n'\
+					  'Congratulations, you won!')
+				self.user_score += 1
+			# computer wins
+			if winner == 'O':
+				print('Winner: O (computer)\n'\
+					  'Sorry, you lost. Better luck next time.')
+				self.comp_score += 1
+			# tie game
+			if winner == 'C':
+				print("Winner: It's a tie!\n"\
+					  "Better luck next time.")
+
+			self.print_scores()
+
+			try:
+				if self.play_again():
+					return False
+				return True
+			except KeyboardInterrupt:
+				return True
 		return False
 
 	def print_board(self):
@@ -296,7 +322,6 @@ def play_game(board):
 	"""Play a game of tic-tac-toe against the user."""
 	while True:
 		winner = ' '
-		# user's turn
 		if board.player == 'X':
 			try:
 				move = input('Your turn\n'\
@@ -313,39 +338,12 @@ def play_game(board):
 				print('\nGoodbye')
 				return
 		else:
-			# randomly choose spot, then linear probe
 			board.make_comp_move()
 			winner = board.check_for_winner()
 			board.player = 'X'
 
-		if winner != ' ':
-			# user wins
-			if winner == 'X':
-				print('Winner: X (you)\n'\
-					  'Congratulations, you won!')
-				board.user_score += 1
-			# computer wins
-			if winner == 'O':
-				print('Winner: O (computer)\n'\
-					  'Sorry, you lost. Better luck next time.')
-				board.comp_score += 1
-			# tie game
-			if winner == 'C':
-				print("Winner: It's a tie!\n"\
-					  "Better luck next time.")
-
-			board.print_scores()
-
-			try:
-				if board.play_again():
-					continue
-			except KeyboardInterrupt:
-				print('\nGoodbye')
-				return
-			else:
-				print('Goodbye')
-				return
-
+		if board.game_over(winner):
+			return
 
 def print_welcome():
 	"""Print welcome, directions and rules. Only prints at the start
