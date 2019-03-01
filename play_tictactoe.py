@@ -15,12 +15,12 @@ class WinCombo:
 			if self.user_count > other.user_count:
 				return True
 			if self.user_count == other.user_count:
-				if self.id < other.id:
-					return True
+				return self.id < other.id
 		return False
 
 	def __str__(self):
-		return ("INDICES: " + str(self.indices) + (" USER: %d, COMP: %d" % (self.user_count, self.comp_count)))
+		string = ("INDICES: " + str(self.indices) + (" USER: %d, COMP: %d" % (self.user_count, self.comp_count)))
+		return string
 
 
 class TicTacToeBoard:
@@ -89,17 +89,19 @@ class TicTacToeBoard:
 			print("You start!")
 			board.player = 'X'
 
-	def could_win(self, move, player):
-		possible_wins = 0
+	def get_potential(self, move):
+		""" Return a list where first elt is possible comp wins, second
+		    is possible user wins.
+		"""
+		possible_comp_wins = 0
+		possible_user_wins = 0
 		for combo in self.combo_queue:
-			if player == 'X':
-				if (move in combo.indices and combo.user_count + 1 == self.size - 1):
-					possible_wins += 1
-			else:
-				if (move in combo.indices) and (combo.comp_count + 1 == self.size - 1):
-					possible_wins += 1
-		if possible_wins > 1:
-			return True
+			if move in combo.indices:
+				if combo.user_count + 1 == self.size - 1 and combo.comp_count == 0:
+					possible_user_wins += 1
+				if combo.comp_count + 1 == self.size - 1 and combo.user_count == 0:
+					possible_comp_wins += 1
+		return max(possible_user_wins, possible_comp_wins)
 
 	def make_move(self, move):
 		"""Make the player's move on the game board. X=user, O=computer."""
@@ -125,25 +127,20 @@ class TicTacToeBoard:
 		self.make_move(position)
 
 	def first_comp_move(self):
-		# choose center or corner
+		# choose center or first corner
 		mul = (self.size - 1) / 2
 		center = (self.size * mul) + mul
 		center = int(center)
 		if self.is_open(center):
 			self.make_move(center)
 		else:
-			for corner in self.corners:
-				if self.is_open(corner):
-					self.make_move(corner)
-					break
+			self.make_move(self.corners[0])
 
 	def make_winning_move(self):
-		move = 0
-		found = False
+		""" Make a winning move, or take a winning move from User"""
 		for combo in self.combo_queue:
 			if (combo.user_count == self.size - 1 or
 				combo.comp_count == self.size - 1):
-				# playing to not lose
 				for idx in combo.indices:
 					if self.is_open(idx):
 						self.make_move(idx)
@@ -151,9 +148,10 @@ class TicTacToeBoard:
 		return False
 
 	def handle_corners(self):
+		""" Handle if user owns two opposite corners"""
 		if ((self.board[self.corners[0]] == 'X' and self.board[self.corners[3]] == 'X') or
 			(self.board[self.corners[1]] == 'X' and self.board[self.corners[2]] == 'X')):
-			found = False
+
 			for combo in self.combo_queue:
 				for idx in combo.indices:
 					if self.is_open(idx):
@@ -163,28 +161,26 @@ class TicTacToeBoard:
 
 	def make_comp_move(self):
 		self.combo_queue.sort(reverse=True)
-		print("SORTED")
-		for combo in self.combo_queue:
-			print(combo)
+		# print("SORTED")
+		# for combo in self.combo_queue:
+		# 	print(combo)
 		if self.moves > 1:			
 			winning_move = self.make_winning_move()
 			if not winning_move:
 				user_has_corners = self.handle_corners()
 				if not user_has_corners:
-					found = False
+					# choose spot with highest potential
+					max_potential = 0
+					max_idx = 0
 					for combo in self.combo_queue:
 						for idx in combo.indices:
-							if self.is_open(idx) and self.could_win(idx, 'O'):
-								move = idx
-								found = True
-								break
-							if self.is_open(idx) and self.could_win(idx, 'X'):
-								move = idx
-								found = True
-								break
-						if found:
-							self.make_move(move)
-							break
+							if self.is_open(idx):
+								ptn = self.get_potential(idx)
+								if ptn > max_potential:
+									max_potential = ptn
+									max_idx = idx
+					self.make_move(max_idx)
+					return
 				else:
 					pass
 		else:
