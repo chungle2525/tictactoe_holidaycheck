@@ -79,20 +79,16 @@ class TicTacToeBoard:
 			self.combo_queue.append(combo)
 
 	def choose_starter(self):
-		"""randomly choose starting player"""
-		starter = random.randint(0, 1)
-		starter = 1
-		if starter == 0:
-			print("Computer starts!")
-			board.player = 'O'
-		else:
-			print("You start!")
-			board.player = 'X'
+		"""Randomly choose starting player"""
+		# if random.randint(0, 1) == 0:
+		print("Computer starts!")
+		board.player = 'O'
+		# else:
+		# 	print("You start!")
+		# 	board.player = 'X'
 
 	def get_potential(self, move):
-		""" Return a list where first elt is possible comp wins, second
-		    is possible user wins.
-		"""
+		"""Return maximum potential winning combos for current move."""
 		possible_comp_wins = 0
 		possible_user_wins = 0
 		for combo in self.combo_queue:
@@ -127,7 +123,7 @@ class TicTacToeBoard:
 		self.make_move(position)
 
 	def first_comp_move(self):
-		# choose center or first corner
+		"""Choose center or first corner as computer's first move"""
 		mul = (self.size - 1) / 2
 		center = (self.size * mul) + mul
 		center = int(center)
@@ -137,7 +133,7 @@ class TicTacToeBoard:
 			self.make_move(self.corners[0])
 
 	def make_winning_move(self):
-		""" Make a winning move, or take a winning move from User"""
+		"""Make a winning move, or take a winning move from the user"""
 		for combo in self.combo_queue:
 			if (combo.user_count == self.size - 1 or
 				combo.comp_count == self.size - 1):
@@ -151,7 +147,7 @@ class TicTacToeBoard:
 		""" Handle if user owns two opposite corners"""
 		if ((self.board[self.corners[0]] == 'X' and self.board[self.corners[3]] == 'X') or
 			(self.board[self.corners[1]] == 'X' and self.board[self.corners[2]] == 'X')):
-
+			# ignore potential, try to win
 			for combo in self.combo_queue:
 				for idx in combo.indices:
 					if self.is_open(idx):
