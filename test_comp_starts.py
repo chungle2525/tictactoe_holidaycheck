@@ -23,8 +23,58 @@ def opposite_corners():
 	assert board.user_score == 0
 	assert board.comp_score == 1
 
+def adjacent_corners():
+	"""Test if user takes adjacent corners"""
+	# top two
+	board = TicTacToeBoard(3)
+	board.player = 'O'
+	sys.stdin = io.StringIO("1a\n1c\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+	# right two
+	board = TicTacToeBoard(3)
+	board.player = 'O'
+	sys.stdin = io.StringIO("1c\n3c\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+	# bottom two
+	board = TicTacToeBoard(3)
+	board.player = 'O'
+	sys.stdin = io.StringIO("3a\n3c\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+	# left two
+	board = TicTacToeBoard(3)
+	board.player = 'O'
+	sys.stdin = io.StringIO("1a\n3a\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+
+def opposite_middles():
+	"""Test if user takes adjacent corners"""
+	# vertical two
+	board = TicTacToeBoard(3)
+	board.player = 'O'
+	sys.stdin = io.StringIO("1b\n3b\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+	# horizontal two
+	board = TicTacToeBoard(3)
+	board.player = 'O'
+	sys.stdin = io.StringIO("2a\n2c\nn\n")
+	play_game(board)
+	assert board.user_score == 0
+	assert board.comp_score == 1
+
 def test_comp_starts_comp_wins():
 	opposite_corners()
+	adjacent_corners()
+	opposite_middles()
 
 
 def test_play_game():
