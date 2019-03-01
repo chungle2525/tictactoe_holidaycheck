@@ -1,11 +1,6 @@
 from play_tictactoe import TicTacToeBoard
 
 def test_wc():
-	board_0 = TicTacToeBoard(0)
-	win_combos0 = []
-	for combo in board_0.combo_queue:
-		win_combos0.append(combo.indices)
-	assert(win_combos0 == [])
 
 	board_1 = TicTacToeBoard(1)
 	win_combos1 = []
